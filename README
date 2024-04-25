@@ -1,0 +1,4 @@
+// Empezamos ubicandonos en nuestro direcotrio de node y tiramos el siguiente comando para iniciar nuestro api: npm init -y
+    - Esto generara un package.json, añadiremos la siguiente linea: "type": "module" (para que se pueda usar import con react)
+
+    - Necesitarás ws, un módulo de WebSocket para Node.js. Ejecuta npm install ws 
