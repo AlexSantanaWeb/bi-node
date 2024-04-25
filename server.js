@@ -1,7 +1,14 @@
-// Importar modulo ws
+const express = require('express');
+const http = require('http');
 const WebSocket = require('ws');
 
-// Definir la clase SalaChatServer
+// Crear una instancia de la aplicación Express
+const app = express();
+
+// Crear un servidor HTTP utilizando Express
+const server = http.createServer(app);
+
+// Importar el módulo ws y definir la clase SalaChatServer
 class SalaChatServer extends WebSocket.Server {
     constructor(options) {
         super(options);
@@ -30,24 +37,38 @@ class SalaChatServer extends WebSocket.Server {
     }
 }
 
-// Crear un nuevo servidor websocket en el puerto 9000
-const wss = new SalaChatServer({ port: 3000 });
+// Crear un servidor WebSocket utilizando el servidor HTTP
+const wss = new SalaChatServer({ server });
 
-console.log('Servidor WebSocket iniciado en el puerto 3000');
+// Agregar middleware para configurar las cabeceras CORS
+app.use(function (req, res, next) {
+    // Permitir acceso desde cualquier origen
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Permitir los encabezados de solicitud que incluyen la solicitud del cliente
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    // Permitir los métodos de solicitud GET, POST y OPTIONS
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    next();
+});
 
-// Evento que se dispara cuando el servidor recibe un mensaje del cliente
+// Manejar la conexión WebSocket
 wss.on('connection', function connection(ws) {
     console.log('Cliente conectado');
 
-    // Evento que se dispara cuando el servidor recibe un mensaje del cliente
+    // Escuchar los mensajes del cliente
     ws.on('message', function incoming(message) {
         // Convertir el buffer recibido a una cadena de texto
         const messageString = message.toString();
         console.log('Mensaje recibido:', messageString);
     });
 
-    // Evento que se dispara cuando se cierra la conexión con el cliente
+    // Escuchar el cierre de la conexión
     ws.on('close', function close() {
         console.log('Cliente desconectado');
     });
+});
+
+// Iniciar el servidor HTTP en el puerto 3000
+server.listen(3000, function () {
+    console.log('Servidor WebSocket iniciado en el puerto 3000');
 });
